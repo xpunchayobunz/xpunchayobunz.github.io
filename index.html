@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>🐔 Global Chicken Map</title>
+  <title>🐔 The Cozy Coop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Fonts -->
@@ -31,6 +31,13 @@
       font-weight: 600;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       z-index: 1000;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      opacity: 0.6;
+      margin-top: 2px;
     }
 
     #picker {
@@ -72,24 +79,22 @@
       background: #ffbe7a;
     }
 
-    /* ✍️ Cozy popup */
+    /* ✍️ Popup style */
     .leaflet-popup-content {
       font-family: 'Patrick Hand', cursive;
       font-size: 16px;
-      line-height: 1.4;
     }
 
     .leaflet-popup-content-wrapper {
       background: #fff8ff;
       border-radius: 14px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
     }
 
     .leaflet-popup-tip {
       background: #fff8ff;
     }
 
-    /* 🌸 Welcome overlay with fade */
+    /* 🌸 Welcome */
     #welcome {
       position: fixed;
       top: 0;
@@ -102,7 +107,6 @@
       align-items: center;
       justify-content: center;
       z-index: 2000;
-
       opacity: 1;
       transition: opacity 0.5s ease;
     }
@@ -118,7 +122,6 @@
       border-radius: 20px;
       text-align: center;
       max-width: 300px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
 
     .welcome-box h2 {
@@ -128,7 +131,6 @@
 
     .welcome-box p {
       font-size: 14px;
-      color: #555;
     }
 
     .welcome-box button {
@@ -140,6 +142,17 @@
     .welcome-box button:hover {
       background: #b89cff;
     }
+
+    /* ✨ sparkle */
+    .sparkle {
+      display: inline-block;
+      animation: twinkle 1.5s infinite alternate;
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.6; transform: scale(1); }
+      to { opacity: 1; transform: scale(1.2); }
+    }
   </style>
 </head>
 
@@ -148,16 +161,20 @@
 <!-- 🌸 Welcome -->
 <div id="welcome">
   <div class="welcome-box">
-    <h2>🐔 Welcome!</h2>
+    <h2>🐔 The Cozy Coop</h2>
     <p>
-      Drop a little chicken roughly where you're from 🌍<br><br>
-      Pick your favourite chook and leave a message if you like 💜
+      welcome to my little chicken map <span class="sparkle">✨</span><br>
+      — xPUNCHAYOBUNZ
     </p>
     <button onclick="closeWelcome()">Start exploring</button>
   </div>
 </div>
 
-<div class="title">🐔 Global Chicken Map</div>
+<div class="title">
+  🐔 The Cozy Coop
+  <div class="subtitle">by xPUNCHAYOBUNZ</div>
+</div>
+
 <div id="map"></div>
 
 <div id="picker">
@@ -194,121 +211,80 @@ const chickens = {
 let selectedLocation = null;
 let tempMarker = null;
 
-// 🌍 Locked map
 const map = L.map('map', {
   worldCopyJump: false,
-  maxBounds: [
-    [-90, -180],
-    [90, 180]
-  ],
+  maxBounds: [[-90,-180],[90,180]],
   maxBoundsViscosity: 1.0,
   minZoom: 2,
   maxZoom: 6
-}).setView([20, 0], 2);
+}).setView([20,0],2);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: ''
-}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// Load pins
 async function loadPins() {
-  const { data, error } = await client.from('pins').select('*');
-
-  if (error) {
-    console.error(error);
-    return;
-  }
+  const { data } = await client.from('pins').select('*');
 
   data.forEach(pin => {
-    const iconUrl = chickens[pin.chicken] || chickens.blue;
-
-    const customIcon = L.icon({
-      iconUrl,
-      iconSize: [40, 40],
-      iconAnchor: [20, 40]
+    const icon = L.icon({
+      iconUrl: chickens[pin.chicken] || chickens.blue,
+      iconSize: [40,40],
+      iconAnchor: [20,40]
     });
 
-    L.marker([pin.lat, pin.lng], { icon: customIcon }).addTo(map)
-      .bindPopup(pin.name + (pin.message ? "<br>" + pin.message : ""));
+    L.marker([pin.lat,pin.lng],{icon}).addTo(map)
+      .bindPopup(pin.name + (pin.message ? "<br>"+pin.message : ""));
   });
 }
 
 loadPins();
 
-// Click map
-map.on('click', function(e) {
+map.on('click', e => {
   selectedLocation = e.latlng;
 
-  if (tempMarker) {
-    map.removeLayer(tempMarker);
-  }
+  if (tempMarker) map.removeLayer(tempMarker);
 
-  tempMarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+  tempMarker = L.marker([e.latlng.lat,e.latlng.lng]).addTo(map);
 
   document.getElementById("picker").style.display = "block";
 });
 
-// Cancel
-function cancelSelection() {
-  selectedLocation = null;
-
-  if (tempMarker) {
-    map.removeLayer(tempMarker);
-    tempMarker = null;
-  }
-
-  document.getElementById("picker").style.display = "none";
+function cancelSelection(){
+  selectedLocation=null;
+  if(tempMarker){ map.removeLayer(tempMarker); tempMarker=null; }
+  document.getElementById("picker").style.display="none";
 }
 
-// Select chicken
-async function selectChicken(color) {
+async function selectChicken(color){
   const name = prompt("Your name:");
-  if (!name) return;
+  if(!name) return;
 
-  let message = prompt("Message (optional):");
-  if (!message) message = "";
-
-  const lat = selectedLocation.lat;
-  const lng = selectedLocation.lng;
+  let message = prompt("Message (optional):") || "";
 
   const { error } = await client.from('pins').insert([
-    { name, message, lat, lng, chicken: color }
+    { name, message, lat:selectedLocation.lat, lng:selectedLocation.lng, chicken:color }
   ]);
 
-  if (error) {
-    alert("Error saving pin!");
-    console.error(error);
-    return;
-  }
+  if(error){ alert("Error saving"); return; }
 
-  if (tempMarker) {
-    map.removeLayer(tempMarker);
-    tempMarker = null;
-  }
+  if(tempMarker){ map.removeLayer(tempMarker); tempMarker=null; }
 
-  const iconUrl = chickens[color];
-
-  const customIcon = L.icon({
-    iconUrl,
-    iconSize: [40, 40],
-    iconAnchor: [20, 40]
+  const icon = L.icon({
+    iconUrl: chickens[color],
+    iconSize: [40,40],
+    iconAnchor: [20,40]
   });
 
-  L.marker([lat, lng], { icon: customIcon }).addTo(map)
-    .bindPopup(name + (message ? "<br>" + message : ""))
+  L.marker([selectedLocation.lat,selectedLocation.lng],{icon}).addTo(map)
+    .bindPopup(name + (message ? "<br>"+message : ""))
     .openPopup();
 
-  document.getElementById("picker").style.display = "none";
+  document.getElementById("picker").style.display="none";
 }
 
-// 🌸 Fade welcome
-function closeWelcome() {
-  const el = document.getElementById("welcome");
+function closeWelcome(){
+  const el=document.getElementById("welcome");
   el.classList.add("hidden");
-
-  setTimeout(() => {
-    el.style.display = "none";
-  }, 500);
+  setTimeout(()=>el.style.display="none",500);
 }
 </script>
 
