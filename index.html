@@ -89,7 +89,7 @@
       background: #fff8ff;
     }
 
-    /* 🌸 Welcome (bigger + purple aesthetic) */
+    /* 🌸 Welcome overlay */
     #welcome {
       position: fixed;
       top: 0;
@@ -121,20 +121,26 @@
     }
 
     .welcome-main {
-      font-size: 20px;
+      font-size: 22px;
       color: #7a5cc2;
       font-weight: 600;
-      margin-bottom: 10px;
+      margin-bottom: 4px;
+    }
+
+    .welcome-sub {
+      font-size: 14px;
+      margin-bottom: 14px;
+      opacity: 0.8;
     }
 
     .welcome-text {
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
       color: #555;
     }
 
     .welcome-sign {
-      margin-top: 12px;
+      margin-top: 14px;
       font-size: 13px;
       opacity: 0.7;
     }
@@ -167,12 +173,17 @@
 <!-- 🌸 Welcome -->
 <div id="welcome">
   <div class="welcome-box">
+
     <div class="welcome-main">
-      welcome to my little chicken map <span class="sparkle">✨</span>
+      <span class="sparkle">✨</span> Welcome <span class="sparkle">✨</span>
+    </div>
+
+    <div class="welcome-sub">
+      to my little chicken map
     </div>
 
     <div class="welcome-text">
-      drop a little chicken roughly where you're from 🌍<br>
+      drop a little chicken roughly where you're from 🌍<br><br>
       pick your favourite chook and leave a message if you like 💜
     </div>
 
@@ -181,6 +192,7 @@
     </div>
 
     <button onclick="closeWelcome()">Start exploring</button>
+
   </div>
 </div>
 
@@ -244,7 +256,7 @@ async function loadPins() {
       iconUrl: chickens[pin.chicken] || chickens.blue,
       iconSize: [40,40],
       iconAnchor: [20,30],
-      popupAnchor: [-5,-30] // ← shifted LEFT
+      popupAnchor: [-10,-30] // ← MORE LEFT toward beak
     });
 
     L.marker([pin.lat,pin.lng],{icon}).addTo(map)
@@ -288,7 +300,7 @@ async function selectChicken(color){
     iconUrl: chickens[color],
     iconSize: [40,40],
     iconAnchor: [20,30],
-    popupAnchor: [-5,-30]
+    popupAnchor: [-10,-30]
   });
 
   L.marker([selectedLocation.lat,selectedLocation.lng],{icon}).addTo(map)
