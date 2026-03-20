@@ -52,7 +52,6 @@
 <div class="title">🐔 Global Chicken Map</div>
 <div id="map"></div>
 
-<!-- Chicken Picker -->
 <div id="picker">
   <p>Choose your chicken 🐔</p>
   <img src="https://xpunchayobunz.github.io/blue.png" onclick="selectChicken('blue')">
@@ -72,7 +71,6 @@ const client = window.supabase.createClient(
   "sb_publishable_F2gIJKu5f-IcX_SAhSO_sw_XBWIkUBm"
 );
 
-// Chicken icons
 const chickens = {
   blue: "https://xpunchayobunz.github.io/blue.png",
   green: "https://xpunchayobunz.github.io/green.png",
@@ -84,14 +82,15 @@ const chickens = {
 
 let selectedLocation = null;
 
+// ✅ LOCKED MAP (no infinite scrolling)
 const map = L.map('map', {
   worldCopyJump: false,
   maxBounds: [
     [-90, -180],
     [90, 180]
   ],
-  maxBoundsViscosity: 1.0
-   minZoom: 2,
+  maxBoundsViscosity: 1.0,
+  minZoom: 2,
   maxZoom: 6
 }).setView([20, 0], 2);
 
@@ -99,7 +98,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: ''
 }).addTo(map);
 
-// Load existing pins
+// Load pins
 async function loadPins() {
   const { data, error } = await client.from('pins').select('*');
 
@@ -124,13 +123,13 @@ async function loadPins() {
 
 loadPins();
 
-// Click map → open picker
+// Click map → show picker
 map.on('click', function(e) {
   selectedLocation = e.latlng;
   document.getElementById("picker").style.display = "block";
 });
 
-// When chicken selected
+// Select chicken
 async function selectChicken(color) {
   const name = prompt("Your name:");
   if (!name) return;
