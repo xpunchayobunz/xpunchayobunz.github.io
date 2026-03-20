@@ -134,8 +134,8 @@ async function selectChicken(color) {
   const name = prompt("Your name:");
   if (!name) return;
 
-  const message = prompt("Message:");
-  if (!message) return;
+let message = prompt("Message (optional):");
+if (!message) message = "";
 
   const lat = selectedLocation.lat;
   const lng = selectedLocation.lng;
