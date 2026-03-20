@@ -78,11 +78,20 @@
     .leaflet-popup-content {
       font-family: 'Patrick Hand', cursive;
       font-size: 16px;
+      font-weight: 600;
     }
 
     .leaflet-popup-content-wrapper {
       background: #fff8ff;
       border-radius: 14px;
+      transform: scale(0.8);
+      animation: popupIn 0.2s ease forwards;
+    }
+
+    @keyframes popupIn {
+      to {
+        transform: scale(1);
+      }
     }
 
     .leaflet-popup-tip {
@@ -146,6 +155,12 @@
       color: #444;
     }
 
+    .welcome-chicken {
+      font-size: 18px;
+      margin: 6px 0;
+      animation: floaty 3s ease-in-out infinite;
+    }
+
     .welcome-icons {
       margin-top: 10px;
       font-size: 16px;
@@ -207,7 +222,10 @@
     </div>
 
     <div class="welcome-text">
-      click anywhere to drop your chicken on the map<br><br>
+      click anywhere to drop your chook on the map<br><br>
+
+      <div class="welcome-chicken">🐔</div>
+
       pick your favourite and leave a little message
     </div>
 
@@ -275,13 +293,12 @@ const map = L.map('map', {
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// 💬 MORE LEFT adjustment
 function createIcon(url) {
   return L.icon({
     iconUrl: url,
     iconSize: [40,40],
     iconAnchor: [20,34],
-    popupAnchor: [-18,-28] // ← pushed further left
+    popupAnchor: [-18,-28]
   });
 }
 
