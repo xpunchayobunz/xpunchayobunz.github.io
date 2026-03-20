@@ -38,12 +38,23 @@ const client = window.supabase.createClient(
   "sb_publishable_F2gIJKu5f-IcX_SAhSO_sw_XBWIkUBm"
 );
 
+// 🐔 chicken icons
+const chickens = {
+  blue: "https://xpunchayobunz.github.io/blue.png",
+  green: "https://xpunchayobunz.github.io/green.png",
+  orange: "https://xpunchayobunz.github.io/orange.png",
+  pink: "https://xpunchayobunz.github.io/pink.png",
+  purple: "https://xpunchayobunz.github.io/purple.png",
+  yellow: "https://xpunchayobunz.github.io/yellow.png"
+};
+
 const map = L.map('map').setView([20, 0], 2);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: ''
 }).addTo(map);
 
+// LOAD PINS
 async function loadPins() {
   const { data, error } = await client.from('pins').select('*');
 
@@ -53,13 +64,22 @@ async function loadPins() {
   }
 
   data.forEach(pin => {
-    L.marker([pin.lat, pin.lng]).addTo(map)
+    const iconUrl = chickens[pin.chicken] || chickens.blue;
+
+    const customIcon = L.icon({
+      iconUrl,
+      iconSize: [40, 40],
+      iconAnchor: [20, 40]
+    });
+
+    L.marker([pin.lat, pin.lng], { icon: customIcon }).addTo(map)
       .bindPopup("🐔 " + pin.name + "<br>" + pin.message);
   });
 }
 
 loadPins();
 
+// ADD PIN
 map.on('click', async function(e) {
   const name = prompt("Your name:");
   if (!name) return;
@@ -67,11 +87,15 @@ map.on('click', async function(e) {
   const message = prompt("Message:");
   if (!message) return;
 
+  const chickenChoice = prompt(
+    "Choose your chicken 🐔 (blue, green, orange, pink, purple, yellow)"
+  );
+
   const lat = e.latlng.lat;
   const lng = e.latlng.lng;
 
   const { error } = await client.from('pins').insert([
-    { name, message, lat, lng }
+    { name, message, lat, lng, chicken: chickenChoice }
   ]);
 
   if (error) {
@@ -80,19 +104,19 @@ map.on('click', async function(e) {
     return;
   }
 
-  L.marker([lat, lng]).addTo(map)
+  const iconUrl = chickens[chickenChoice] || chickens.blue;
+
+  const customIcon = L.icon({
+    iconUrl,
+    iconSize: [40, 40],
+    iconAnchor: [20, 40]
+  });
+
+  L.marker([lat, lng], { icon: customIcon }).addTo(map)
     .bindPopup("🐔 " + name + "<br>" + message)
     .openPopup();
 });
 </script>
-  const chickens = {
-  blue: "https://xpunchayobunz.github.io/blue.png",
-  green: "https://xpunchayobunz.github.io/green.png",
-  orange: "https://xpunchayobunz.github.io/orange.png",
-  pink: "https://xpunchayobunz.github.io/pink.png",
-  purple: "https://xpunchayobunz.github.io/purple.png",
-  yellow: "https://xpunchayobunz.github.io/yellow.png"
-};
 
 </body>
 </html>
