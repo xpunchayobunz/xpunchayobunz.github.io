@@ -4,8 +4,8 @@
   <title>🐔 Global Chicken Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Cozy font -->
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&family=Patrick+Hand&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
@@ -72,11 +72,24 @@
       background: #ffbe7a;
     }
 
+    /* ✍️ Cozy popup */
     .leaflet-popup-content {
-      font-family: 'Quicksand', sans-serif;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 16px;
+      line-height: 1.4;
     }
 
-    /* 🌸 Welcome overlay */
+    .leaflet-popup-content-wrapper {
+      background: #fff8ff;
+      border-radius: 14px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    }
+
+    .leaflet-popup-tip {
+      background: #fff8ff;
+    }
+
+    /* 🌸 Welcome overlay with fade */
     #welcome {
       position: fixed;
       top: 0;
@@ -89,6 +102,14 @@
       align-items: center;
       justify-content: center;
       z-index: 2000;
+
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+
+    #welcome.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .welcome-box {
@@ -124,7 +145,7 @@
 
 <body>
 
-<!-- 🌸 Welcome screen -->
+<!-- 🌸 Welcome -->
 <div id="welcome">
   <div class="welcome-box">
     <h2>🐔 Welcome!</h2>
@@ -280,9 +301,14 @@ async function selectChicken(color) {
   document.getElementById("picker").style.display = "none";
 }
 
-// Close welcome
+// 🌸 Fade welcome
 function closeWelcome() {
-  document.getElementById("welcome").style.display = "none";
+  const el = document.getElementById("welcome");
+  el.classList.add("hidden");
+
+  setTimeout(() => {
+    el.style.display = "none";
+  }, 500);
 }
 </script>
 
