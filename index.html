@@ -37,7 +37,6 @@
     .subtitle {
       font-size: 12px;
       opacity: 0.6;
-      margin-top: 2px;
     }
 
     #picker {
@@ -124,13 +123,8 @@
       max-width: 300px;
     }
 
-    .welcome-box h2 {
-      margin-top: 0;
-      color: #7a5cc2;
-    }
-
     .welcome-box p {
-      font-size: 14px;
+      line-height: 1.5;
     }
 
     .welcome-box button {
@@ -161,9 +155,10 @@
 <!-- 🌸 Welcome -->
 <div id="welcome">
   <div class="welcome-box">
-    <h2>🐔 The Cozy Coop</h2>
     <p>
-      welcome to my little chicken map <span class="sparkle">✨</span><br>
+      welcome to my little chicken map <span class="sparkle">✨</span><br><br>
+      drop a little chicken roughly where you're from 🌍<br>
+      pick your favourite chook and leave a message if you like 💜<br><br>
       — xPUNCHAYOBUNZ
     </p>
     <button onclick="closeWelcome()">Start exploring</button>
@@ -221,6 +216,7 @@ const map = L.map('map', {
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
+// Load pins
 async function loadPins() {
   const { data } = await client.from('pins').select('*');
 
@@ -228,7 +224,8 @@ async function loadPins() {
     const icon = L.icon({
       iconUrl: chickens[pin.chicken] || chickens.blue,
       iconSize: [40,40],
-      iconAnchor: [20,40]
+      iconAnchor: [20,30],
+      popupAnchor: [12,-30] // 💬 shifted toward beak
     });
 
     L.marker([pin.lat,pin.lng],{icon}).addTo(map)
@@ -238,6 +235,7 @@ async function loadPins() {
 
 loadPins();
 
+// Click map
 map.on('click', e => {
   selectedLocation = e.latlng;
 
@@ -248,12 +246,14 @@ map.on('click', e => {
   document.getElementById("picker").style.display = "block";
 });
 
+// Cancel
 function cancelSelection(){
   selectedLocation=null;
   if(tempMarker){ map.removeLayer(tempMarker); tempMarker=null; }
   document.getElementById("picker").style.display="none";
 }
 
+// Select chicken
 async function selectChicken(color){
   const name = prompt("Your name:");
   if(!name) return;
@@ -271,7 +271,8 @@ async function selectChicken(color){
   const icon = L.icon({
     iconUrl: chickens[color],
     iconSize: [40,40],
-    iconAnchor: [20,40]
+    iconAnchor: [20,30],
+    popupAnchor: [12,-30]
   });
 
   L.marker([selectedLocation.lat,selectedLocation.lng],{icon}).addTo(map)
@@ -281,6 +282,7 @@ async function selectChicken(color){
   document.getElementById("picker").style.display="none";
 }
 
+// Welcome fade
 function closeWelcome(){
   const el=document.getElementById("welcome");
   el.classList.add("hidden");
