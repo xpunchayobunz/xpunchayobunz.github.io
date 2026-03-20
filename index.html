@@ -21,6 +21,29 @@
       font-weight: bold;
       z-index: 1000;
     }
+
+    #picker {
+      display: none;
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      z-index: 1000;
+      text-align: center;
+    }
+
+    #picker img {
+      width: 40px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    #picker img:hover {
+      transform: scale(1.2);
+    }
   </style>
 </head>
 
@@ -28,6 +51,17 @@
 
 <div class="title">🐔 Global Chicken Map</div>
 <div id="map"></div>
+
+<!-- Chicken Picker -->
+<div id="picker">
+  <p>Choose your chicken 🐔</p>
+  <img src="https://xpunchayobunz.github.io/blue.png" onclick="selectChicken('blue')">
+  <img src="https://xpunchayobunz.github.io/green.png" onclick="selectChicken('green')">
+  <img src="https://xpunchayobunz.github.io/orange.png" onclick="selectChicken('orange')">
+  <img src="https://xpunchayobunz.github.io/pink.png" onclick="selectChicken('pink')">
+  <img src="https://xpunchayobunz.github.io/purple.png" onclick="selectChicken('purple')">
+  <img src="https://xpunchayobunz.github.io/yellow.png" onclick="selectChicken('yellow')">
+</div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -38,7 +72,7 @@ const client = window.supabase.createClient(
   "sb_publishable_F2gIJKu5f-IcX_SAhSO_sw_XBWIkUBm"
 );
 
-// 🐔 chicken icons
+// Chicken icons
 const chickens = {
   blue: "https://xpunchayobunz.github.io/blue.png",
   green: "https://xpunchayobunz.github.io/green.png",
@@ -48,13 +82,15 @@ const chickens = {
   yellow: "https://xpunchayobunz.github.io/yellow.png"
 };
 
+let selectedLocation = null;
+
 const map = L.map('map').setView([20, 0], 2);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: ''
 }).addTo(map);
 
-// LOAD PINS
+// Load existing pins
 async function loadPins() {
   const { data, error } = await client.from('pins').select('*');
 
@@ -79,23 +115,25 @@ async function loadPins() {
 
 loadPins();
 
-// ADD PIN
-map.on('click', async function(e) {
+// Click map → open picker
+map.on('click', function(e) {
+  selectedLocation = e.latlng;
+  document.getElementById("picker").style.display = "block";
+});
+
+// When chicken selected
+async function selectChicken(color) {
   const name = prompt("Your name:");
   if (!name) return;
 
   const message = prompt("Message:");
   if (!message) return;
 
-  const chickenChoice = prompt(
-    "Choose your chicken 🐔 (blue, green, orange, pink, purple, yellow)"
-  );
-
-  const lat = e.latlng.lat;
-  const lng = e.latlng.lng;
+  const lat = selectedLocation.lat;
+  const lng = selectedLocation.lng;
 
   const { error } = await client.from('pins').insert([
-    { name, message, lat, lng, chicken: chickenChoice }
+    { name, message, lat, lng, chicken: color }
   ]);
 
   if (error) {
@@ -104,7 +142,7 @@ map.on('click', async function(e) {
     return;
   }
 
-  const iconUrl = chickens[chickenChoice] || chickens.blue;
+  const iconUrl = chickens[color];
 
   const customIcon = L.icon({
     iconUrl,
@@ -115,7 +153,9 @@ map.on('click', async function(e) {
   L.marker([lat, lng], { icon: customIcon }).addTo(map)
     .bindPopup("🐔 " + name + "<br>" + message)
     .openPopup();
-});
+
+  document.getElementById("picker").style.display = "none";
+}
 </script>
 
 </body>
