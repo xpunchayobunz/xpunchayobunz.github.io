@@ -16,9 +16,7 @@
       background: #fdfaf6;
     }
 
-    #map {
-      height: 100vh;
-    }
+    #map { height: 100vh; }
 
     .title {
       position: absolute;
@@ -74,9 +72,7 @@
       cursor: pointer;
     }
 
-    button:hover {
-      background: #ffbe7a;
-    }
+    button:hover { background: #ffbe7a; }
 
     /* ✍️ Popup style */
     .leaflet-popup-content {
@@ -93,7 +89,7 @@
       background: #fff8ff;
     }
 
-    /* 🌸 Welcome */
+    /* 🌸 Welcome (bigger + purple aesthetic) */
     #welcome {
       position: fixed;
       top: 0;
@@ -117,14 +113,30 @@
 
     .welcome-box {
       background: #f5edff;
-      padding: 25px;
-      border-radius: 20px;
+      padding: 28px;
+      border-radius: 22px;
       text-align: center;
-      max-width: 300px;
+      max-width: 320px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
 
-    .welcome-box p {
+    .welcome-main {
+      font-size: 20px;
+      color: #7a5cc2;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .welcome-text {
+      font-size: 14px;
       line-height: 1.5;
+      color: #555;
+    }
+
+    .welcome-sign {
+      margin-top: 12px;
+      font-size: 13px;
+      opacity: 0.7;
     }
 
     .welcome-box button {
@@ -155,12 +167,19 @@
 <!-- 🌸 Welcome -->
 <div id="welcome">
   <div class="welcome-box">
-    <p>
-      welcome to my little chicken map <span class="sparkle">✨</span><br><br>
+    <div class="welcome-main">
+      welcome to my little chicken map <span class="sparkle">✨</span>
+    </div>
+
+    <div class="welcome-text">
       drop a little chicken roughly where you're from 🌍<br>
-      pick your favourite chook and leave a message if you like 💜<br><br>
+      pick your favourite chook and leave a message if you like 💜
+    </div>
+
+    <div class="welcome-sign">
       — xPUNCHAYOBUNZ
-    </p>
+    </div>
+
     <button onclick="closeWelcome()">Start exploring</button>
   </div>
 </div>
@@ -225,7 +244,7 @@ async function loadPins() {
       iconUrl: chickens[pin.chicken] || chickens.blue,
       iconSize: [40,40],
       iconAnchor: [20,30],
-      popupAnchor: [12,-30] // 💬 shifted toward beak
+      popupAnchor: [-5,-30] // ← shifted LEFT
     });
 
     L.marker([pin.lat,pin.lng],{icon}).addTo(map)
@@ -235,7 +254,6 @@ async function loadPins() {
 
 loadPins();
 
-// Click map
 map.on('click', e => {
   selectedLocation = e.latlng;
 
@@ -246,14 +264,12 @@ map.on('click', e => {
   document.getElementById("picker").style.display = "block";
 });
 
-// Cancel
 function cancelSelection(){
   selectedLocation=null;
   if(tempMarker){ map.removeLayer(tempMarker); tempMarker=null; }
   document.getElementById("picker").style.display="none";
 }
 
-// Select chicken
 async function selectChicken(color){
   const name = prompt("Your name:");
   if(!name) return;
@@ -272,7 +288,7 @@ async function selectChicken(color){
     iconUrl: chickens[color],
     iconSize: [40,40],
     iconAnchor: [20,30],
-    popupAnchor: [12,-30]
+    popupAnchor: [-5,-30]
   });
 
   L.marker([selectedLocation.lat,selectedLocation.lng],{icon}).addTo(map)
@@ -282,7 +298,6 @@ async function selectChicken(color){
   document.getElementById("picker").style.display="none";
 }
 
-// Welcome fade
 function closeWelcome(){
   const el=document.getElementById("welcome");
   el.classList.add("hidden");
