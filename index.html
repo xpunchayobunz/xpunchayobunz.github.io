@@ -121,17 +121,23 @@
     }
 
     .welcome-main {
-      font-family: 'Patrick Hand', cursive;
       font-size: 24px;
       color: #6b4fd6;
       margin-bottom: 6px;
     }
 
-    .welcome-sub {
+    .welcome-title {
       font-family: 'Patrick Hand', cursive;
-      font-size: 20px;
+      display: inline-block;
+      animation: floaty 3s ease-in-out infinite;
+    }
+
+    .welcome-sub {
+      font-size: 18px;
       color: #6b4fd6;
       margin-bottom: 14px;
+      font-weight: 600;
+      opacity: 0.9;
     }
 
     .welcome-text {
@@ -169,21 +175,31 @@
       animation: twinkle 1.5s infinite alternate;
     }
 
+    .sparkle:nth-child(1) { animation-delay: 0s; }
+    .sparkle:nth-child(3) { animation-delay: 0.5s; }
+
     @keyframes twinkle {
       from { opacity: 0.6; transform: scale(1); }
       to { opacity: 1; transform: scale(1.2); }
+    }
+
+    @keyframes floaty {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-3px); }
+      100% { transform: translateY(0px); }
     }
   </style>
 </head>
 
 <body>
 
-<!-- 🌸 Welcome -->
 <div id="welcome">
   <div class="welcome-box">
 
     <div class="welcome-main">
-      <span class="sparkle">✨</span> Welcome <span class="sparkle">✨</span>
+      <span class="sparkle">✨</span>
+      <span class="welcome-title">Welcome</span>
+      <span class="sparkle">✨</span>
     </div>
 
     <div class="welcome-sub">
@@ -259,12 +275,13 @@ const map = L.map('map', {
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
+// 💬 MORE LEFT adjustment
 function createIcon(url) {
   return L.icon({
     iconUrl: url,
     iconSize: [40,40],
     iconAnchor: [20,34],
-    popupAnchor: [-12,-28]
+    popupAnchor: [-18,-28] // ← pushed further left
   });
 }
 
