@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>🐔 Global Chicken Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body { margin:0; font-family:sans-serif; }
+    #map { height: 100vh; }
+    .title {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: bold;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+<div class="title">🐔 Global Chicken Map</div>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  const map = L.map('map').setView([20, 0], 2);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: ''
+  }).addTo(map);
+
+  map.on('click', function(e) {
+    const name = prompt("Your name:");
+    if (!name) return;
+
+    const message = prompt("Message:");
+    if (!message) return;
+
+    L.marker(e.latlng).addTo(map)
+      .bindPopup("🐔 " + name + "<br>" + message)
+      .openPopup();
+  });
+</script>
+
+</body>
+</html>
