@@ -3,10 +3,14 @@
 <head>
   <title>🐔 Global Chicken Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
   <style>
     body { margin:0; font-family:sans-serif; }
     #map { height: 100vh; }
+
     .title {
       position: absolute;
       top: 10px;
@@ -20,30 +24,70 @@
     }
   </style>
 </head>
+
 <body>
 
 <div class="title">🐔 Global Chicken Map</div>
 <div id="map"></div>
 
+<!-- Scripts -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
 <script>
-  const map = L.map('map').setView([20, 0], 2);
+const supabase = window.supabase.createClient(
+  "https://huggjwzemgmgaojvutni.supabase.co",
+  "sb_publishable_F2gIJKu5f-IcX_SAhSO_sw_XBWIkUBm"
+);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: ''
-  }).addTo(map);
+const map = L.map('map').setView([20, 0], 2);
 
-  map.on('click', function(e) {
-    const name = prompt("Your name:");
-    if (!name) return;
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: ''
+}).addTo(map);
 
-    const message = prompt("Message:");
-    if (!message) return;
+// LOAD EXISTING PINS
+async function loadPins() {
+  const { data, error } = await supabase.from('pins').select('*');
 
-    L.marker(e.latlng).addTo(map)
-      .bindPopup("🐔 " + name + "<br>" + message)
-      .openPopup();
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  data.forEach(pin => {
+    L.marker([pin.lat, pin.lng]).addTo(map)
+      .bindPopup("🐔 " + pin.name + "<br>" + pin.message);
   });
+}
+
+loadPins();
+
+// ADD NEW PIN
+map.on('click', async function(e) {
+  const name = prompt("Your name:");
+  if (!name) return;
+
+  const message = prompt("Message:");
+  if (!message) return;
+
+  const lat = e.latlng.lat;
+  const lng = e.latlng.lng;
+
+  const { error } = await supabase.from('pins').insert([
+    { name, message, lat, lng }
+  ]);
+
+  if (error) {
+    alert("Error saving pin!");
+    console.error(error);
+    return;
+  }
+
+  L.marker([lat, lng]).addTo(map)
+    .bindPopup("🐔 " + name + "<br>" + message)
+    .openPopup();
+});
 </script>
 
 </body>
