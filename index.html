@@ -44,6 +44,12 @@
     #picker img:hover {
       transform: scale(1.2);
     }
+
+    button {
+      margin-top: 10px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -54,15 +60,14 @@
 
 <div id="picker">
   <p>Choose your chicken 🐔</p>
-
   <img src="https://xpunchayobunz.github.io/blue.png" onclick="selectChicken('blue')">
-  <img src="https://xpunchayobunz.github.io/green.png" onclick="selectChicken('green')">
+  <img src="https://xpunchayobunz.github.io/Green.png" onclick="selectChicken('Green')">
   <img src="https://xpunchayobunz.github.io/orange.png" onclick="selectChicken('orange')">
   <img src="https://xpunchayobunz.github.io/pink.png" onclick="selectChicken('pink')">
   <img src="https://xpunchayobunz.github.io/purple.png" onclick="selectChicken('purple')">
   <img src="https://xpunchayobunz.github.io/yellow.png" onclick="selectChicken('yellow')">
 
-  <br><br>
+  <br>
   <button onclick="cancelSelection()">Cancel</button>
 </div>
 
@@ -77,7 +82,7 @@ const client = window.supabase.createClient(
 
 const chickens = {
   blue: "https://xpunchayobunz.github.io/blue.png",
-  green: "https://xpunchayobunz.github.io/green.png",
+  Green: "https://xpunchayobunz.github.io/Green.png",
   orange: "https://xpunchayobunz.github.io/orange.png",
   pink: "https://xpunchayobunz.github.io/pink.png",
   purple: "https://xpunchayobunz.github.io/purple.png",
@@ -85,8 +90,9 @@ const chickens = {
 };
 
 let selectedLocation = null;
+let tempMarker = null;
 
-// ✅ LOCKED MAP (no infinite scrolling)
+// Locked map
 const map = L.map('map', {
   worldCopyJump: false,
   maxBounds: [
@@ -121,25 +127,44 @@ async function loadPins() {
     });
 
     L.marker([pin.lat, pin.lng], { icon: customIcon }).addTo(map)
-      .bindPopup("🐔 " + pin.name + "<br>" + pin.message);
+      .bindPopup("🐔 " + pin.name + (pin.message ? "<br>" + pin.message : ""));
   });
 }
 
 loadPins();
 
-// Click map → show picker
+// Click map
 map.on('click', function(e) {
   selectedLocation = e.latlng;
+
+  if (tempMarker) {
+    map.removeLayer(tempMarker);
+  }
+
+  tempMarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+
   document.getElementById("picker").style.display = "block";
 });
+
+// Cancel
+function cancelSelection() {
+  selectedLocation = null;
+
+  if (tempMarker) {
+    map.removeLayer(tempMarker);
+    tempMarker = null;
+  }
+
+  document.getElementById("picker").style.display = "none";
+}
 
 // Select chicken
 async function selectChicken(color) {
   const name = prompt("Your name:");
   if (!name) return;
 
-let message = prompt("Message (optional):");
-if (!message) message = "";
+  let message = prompt("Message (optional):");
+  if (!message) message = "";
 
   const lat = selectedLocation.lat;
   const lng = selectedLocation.lng;
@@ -154,6 +179,11 @@ if (!message) message = "";
     return;
   }
 
+  if (tempMarker) {
+    map.removeLayer(tempMarker);
+    tempMarker = null;
+  }
+
   const iconUrl = chickens[color];
 
   const customIcon = L.icon({
@@ -163,7 +193,7 @@ if (!message) message = "";
   });
 
   L.marker([lat, lng], { icon: customIcon }).addTo(map)
-    .bindPopup("🐔 " + name + "<br>" + message)
+    .bindPopup("🐔 " + name + (message ? "<br>" + message : ""))
     .openPopup();
 
   document.getElementById("picker").style.display = "none";
