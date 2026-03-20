@@ -1,9 +1,39 @@
-<!-- Scripts -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>🐔 Global Chicken Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    body { margin:0; font-family:sans-serif; }
+    #map { height: 100vh; }
+
+    .title {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: bold;
+      z-index: 1000;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="title">🐔 Global Chicken Map</div>
+<div id="map"></div>
+
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabaseClient = window.supabase.createClient(
+const client = window.supabase.createClient(
   "https://huggjwzemgmgaojvutni.supabase.co",
   "sb_publishable_F2gIJKu5f-IcX_SAhSO_sw_XBWIkUBm"
 );
@@ -14,9 +44,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: ''
 }).addTo(map);
 
-// LOAD PINS
 async function loadPins() {
-  const { data, error } = await supabaseClient.from('pins').select('*');
+  const { data, error } = await client.from('pins').select('*');
 
   if (error) {
     console.error(error);
@@ -31,7 +60,6 @@ async function loadPins() {
 
 loadPins();
 
-// ADD PIN
 map.on('click', async function(e) {
   const name = prompt("Your name:");
   if (!name) return;
@@ -42,7 +70,7 @@ map.on('click', async function(e) {
   const lat = e.latlng.lat;
   const lng = e.latlng.lng;
 
-  const { error } = await supabaseClient.from('pins').insert([
+  const { error } = await client.from('pins').insert([
     { name, message, lat, lng }
   ]);
 
@@ -57,3 +85,6 @@ map.on('click', async function(e) {
     .openPopup();
 });
 </script>
+
+</body>
+</html>
