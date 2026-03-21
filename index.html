@@ -18,7 +18,7 @@
 
     #map {
       height: 100vh;
-      filter: saturate(0.9) brightness(1.02); /* ✨ softer map */
+      filter: saturate(0.95) brightness(1.02);
     }
 
     .title {
@@ -77,7 +77,7 @@
 
     button:hover { background: #ffbe7a; }
 
-    /* ✍️ Popup */
+    /* Popup */
     .leaflet-popup-content {
       font-family: 'Patrick Hand', cursive;
       font-size: 16px;
@@ -99,7 +99,7 @@
       background: #fff8ff;
     }
 
-    /* 🌸 Welcome */
+    /* Welcome */
     #welcome {
       position: fixed;
       top: 0;
@@ -112,7 +112,6 @@
       align-items: center;
       justify-content: center;
       z-index: 2000;
-      opacity: 1;
       transition: opacity 0.5s ease;
     }
 
@@ -156,10 +155,10 @@
       color: #444;
     }
 
+    /* 🐔 NO FLOAT NOW */
     .welcome-chicken {
       font-size: 18px;
       margin: 4px 0 8px 0;
-      animation: floaty 3s ease-in-out infinite;
     }
 
     .welcome-icons {
@@ -185,7 +184,6 @@
       background: #b08cff;
     }
 
-    /* ✨ sparkle */
     .sparkle {
       display: inline-block;
       animation: twinkle 1.5s infinite alternate;
@@ -228,6 +226,10 @@
       <div class="welcome-chicken">🐔</div>
 
       add your username and a little message if you'd like 💜
+    </div>
+
+    <div class="welcome-icons">
+      🌍 💜
     </div>
 
     <div class="welcome-sign">
@@ -288,8 +290,8 @@ const map = L.map('map', {
   maxZoom: 6
 }).setView([20,0],2);
 
-/* 🌍 NEW SOFT MAP STYLE */
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+/* 🌈 COLOURFUL MAP */
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
   attribution: '',
   subdomains: 'abcd',
   maxZoom: 19
