@@ -179,17 +179,13 @@ const map = L.map('map', {
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-/* 🔥 FIX: force map to calculate properly */
-setTimeout(() => {
-  map.invalidateSize();
-}, 100);
-
+/* ✅ FIXED ICON ANCHOR */
 function createIcon(url){
   return L.icon({
     iconUrl:url,
     iconSize:[40,40],
-    iconAnchor:[20,34],
-    popupAnchor:[-18,-28]
+    iconAnchor:[20,20],
+    popupAnchor:[0,-20]
   });
 }
 
@@ -209,15 +205,14 @@ function addMarker(pin){
   }
 }
 
-/* load AFTER map stabilises */
-setTimeout(loadPins,150);
-
 async function loadPins(){
   const {data}=await client.from('pins').select('*');
   data.forEach(addMarker);
 }
 
-/* realtime */
+loadPins();
+
+/* 🔴 REALTIME */
 client.channel('pins')
   .on('postgres_changes',{event:'INSERT',schema:'public',table:'pins'},
     payload=>addMarker(payload.new))
