@@ -11,12 +11,11 @@
     body { 
       margin:0; 
       font-family:'Nunito',sans-serif; 
-      background:#efe4ff; /* 💜 helps frame stand out */
+      background:#efe4ff;
     }
 
     #map { height:100vh; }
 
-    /* 💜 subtle map softening */
     .leaflet-tile {
       filter: brightness(1.03) saturate(0.95);
     }
@@ -29,13 +28,10 @@
       right: 12px;
       bottom: 12px;
       border-radius: 28px;
-
       border: 3px solid rgba(200,180,255,0.8);
-
       box-shadow:
         0 0 0 10px rgba(200,180,255,0.35),
         0 12px 30px rgba(0,0,0,0.2);
-
       pointer-events: none;
       z-index: 500;
     }
@@ -48,9 +44,7 @@
         right: 6px;
         bottom: 6px;
         border-radius: 20px;
-
         border: 2px solid rgba(200,180,255,0.7);
-
         box-shadow:
           0 0 0 6px rgba(200,180,255,0.25),
           0 6px 15px rgba(0,0,0,0.15);
@@ -61,21 +55,42 @@
       }
     }
 
+    /* ✨ IMPROVED HEADER */
     .title {
-      position:absolute;
-      top:10px;
-      left:50%;
-      transform:translateX(-50%);
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+
       background: rgba(200,180,255,0.9);
       color: #4b3bbd;
-      padding:10px 16px;
-      border-radius:14px;
+
+      padding: 8px 14px;
+      border-radius: 16px;
+
       border: 1px solid rgba(107,79,214,0.2);
-      box-shadow:0 4px 10px rgba(0,0,0,0.1);
+      box-shadow:
+        0 4px 10px rgba(0,0,0,0.1),
+        0 0 0 4px rgba(200,180,255,0.25);
+
       backdrop-filter: blur(4px);
       z-index:1000;
+
       font-family:'Patrick Hand',cursive;
-      font-size:18px;
+      font-size:16px;
+
+      width: fit-content;
+      max-width: 85%;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .title {
+        top: 20px;
+        font-size: 15px;
+        padding: 6px 12px;
+        border-radius: 14px;
+      }
     }
 
     #picker, #formBox {
