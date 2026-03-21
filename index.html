@@ -16,7 +16,10 @@
       background: #fdfaf6;
     }
 
-    #map { height: 100vh; }
+    #map {
+      height: 100vh;
+      filter: saturate(0.9) brightness(1.02); /* ✨ softer map */
+    }
 
     .title {
       position: absolute;
@@ -220,11 +223,15 @@
     </div>
 
     <div class="welcome-text">
-      Click anywhere to drop a little chook and let me know where you're from 🌍
+      Click anywhere to drop a little chook and let me know where you're from 🌍<br><br>
 
       <div class="welcome-chicken">🐔</div>
 
       add your username and a little message if you'd like 💜
+    </div>
+
+    <div class="welcome-icons">
+      🌍 💜
     </div>
 
     <div class="welcome-sign">
@@ -285,7 +292,12 @@ const map = L.map('map', {
   maxZoom: 6
 }).setView([20,0],2);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+/* 🌍 NEW SOFT MAP STYLE */
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution: '',
+  subdomains: 'abcd',
+  maxZoom: 19
+}).addTo(map);
 
 function createIcon(url) {
   return L.icon({
