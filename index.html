@@ -179,7 +179,6 @@ const map = L.map('map', {
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-/* ✅ FIXED ICON ANCHOR */
 function createIcon(url){
   return L.icon({
     iconUrl:url,
@@ -189,11 +188,17 @@ function createIcon(url){
   });
 }
 
+/* ✅ FIXED MARKER FUNCTION */
 function addMarker(pin){
   const marker = L.marker([pin.lat,pin.lng],{
     icon:createIcon(chickens[pin.chicken]||chickens.blue)
   }).addTo(map)
     .bindPopup(pin.name+(pin.message?"<br>"+pin.message:""));
+
+  // 🔥 THIS FIXES YOUR ISSUE
+  requestAnimationFrame(() => {
+    map.invalidateSize();
+  });
 
   const el = marker.getElement();
   if(el){
@@ -212,7 +217,7 @@ async function loadPins(){
 
 loadPins();
 
-/* 🔴 REALTIME */
+/* realtime */
 client.channel('pins')
   .on('postgres_changes',{event:'INSERT',schema:'public',table:'pins'},
     payload=>addMarker(payload.new))
