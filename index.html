@@ -56,7 +56,6 @@
       cursor:pointer;
     }
 
-    /* welcome */
     #welcome {
       position:fixed;
       top:0; left:0;
@@ -170,17 +169,20 @@ const chickens = {
 let selectedLocation=null;
 let selectedChicken=null;
 
-/* ✅ YOUR ORIGINAL STABLE MAP */
 const map = L.map('map', {
   worldCopyJump:false,
   maxBounds:[[-90,-180],[90,180]],
   maxBoundsViscosity:1.0,
   minZoom:2,
   maxZoom:6
-}).setView([20,0],2.3);
+}).setView([20,0],2);
 
-/* ✅ SAFE TILE (stable) */
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+/* 🔥 FIX: force map to calculate properly */
+setTimeout(() => {
+  map.invalidateSize();
+}, 100);
 
 function createIcon(url){
   return L.icon({
@@ -207,14 +209,15 @@ function addMarker(pin){
   }
 }
 
+/* load AFTER map stabilises */
+setTimeout(loadPins,150);
+
 async function loadPins(){
   const {data}=await client.from('pins').select('*');
   data.forEach(addMarker);
 }
 
-loadPins();
-
-/* 🔴 REALTIME */
+/* realtime */
 client.channel('pins')
   .on('postgres_changes',{event:'INSERT',schema:'public',table:'pins'},
     payload=>addMarker(payload.new))
