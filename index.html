@@ -4,9 +4,7 @@
   <title>🐔 Chooks Across the World</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&family=Patrick+Hand&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
   <style>
@@ -16,7 +14,8 @@
     .title {
       position:absolute; top:10px; left:50%; transform:translateX(-50%);
       background:#fff8f0; padding:10px 16px; border-radius:14px;
-      box-shadow:0 4px 10px rgba(0,0,0,0.1); z-index:1000; text-align:center;
+      box-shadow:0 4px 10px rgba(0,0,0,0.1); z-index:1000;
+      text-align:center;
     }
 
     #picker, #formBox {
@@ -46,7 +45,6 @@
       border-radius:8px;
       border:1px solid #ddd;
       width:180px;
-      font-family:'Nunito';
     }
 
     button {
@@ -58,6 +56,55 @@
       cursor:pointer;
     }
 
+    /* 🌸 Welcome */
+    #welcome {
+      position:fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:rgba(200,180,255,0.7);
+      backdrop-filter:blur(6px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:2000;
+    }
+
+    .welcome-box {
+      background:#efe4ff;
+      padding:28px;
+      border-radius:22px;
+      text-align:center;
+      max-width:320px;
+    }
+
+    .welcome-title {
+      font-family:'Patrick Hand',cursive;
+      font-size:24px;
+      color:#6b4fd6;
+    }
+
+    .welcome-text {
+      margin-top:10px;
+      font-size:14px;
+    }
+
+    .welcome-chicken {
+      margin:6px 0;
+      font-size:18px;
+    }
+
+    .rules {
+      margin-top:14px;
+      font-size:12px;
+      opacity:0.7;
+      text-align:left;
+    }
+
+    .rules-title {
+      font-weight:600;
+      margin-bottom:4px;
+    }
+
     .leaflet-popup-content {
       font-family:'Patrick Hand',cursive;
       font-weight:600;
@@ -67,13 +114,36 @@
 
 <body>
 
-<div class="title">
-  🐔 Chooks Across the World 🌍
+<div id="welcome">
+  <div class="welcome-box">
+
+    <div class="welcome-title">✨ Welcome ✨</div>
+
+    <div class="welcome-text">
+      Click anywhere to drop a little chook and let me know where you're from 🌍<br><br>
+
+      <div class="welcome-chicken">🐔</div>
+
+      add your username and a little message if you'd like 💜
+    </div>
+
+    <!-- 🐔 RULES -->
+    <div class="rules">
+      <div class="rules-title">little notes 🐔</div>
+      • drop your chook roughly where you're from 🌍<br>
+      • one chook per person 👀<br>
+      • keep it kind and cozy 💜<br>
+      • naughty chooks may become nuggets 🍗
+    </div>
+
+    <br>
+    <button onclick="start()">Start exploring</button>
+  </div>
 </div>
 
+<div class="title">🐔 Chooks Across the World 🌍</div>
 <div id="map"></div>
 
-<!-- 🐔 picker -->
 <div id="picker">
   <p>Choose your chicken 🐔</p>
   <img src="blue.png" onclick="chooseChicken('blue')">
@@ -84,7 +154,6 @@
   <img src="yellow.png" onclick="chooseChicken('yellow')">
 </div>
 
-<!-- ✍️ form -->
 <div id="formBox">
   <input id="name" placeholder="your username">
   <input id="message" placeholder="your message (optional)">
@@ -128,10 +197,19 @@ function createIcon(url){
 }
 
 function addMarker(pin){
-  L.marker([pin.lat,pin.lng],{
+  const marker = L.marker([pin.lat,pin.lng],{
     icon:createIcon(chickens[pin.chicken]||chickens.blue)
   }).addTo(map)
     .bindPopup(pin.name+(pin.message?"<br>"+pin.message:""));
+
+  const el = marker.getElement();
+  if(el){
+    el.style.transform="scale(0)";
+    setTimeout(()=>{
+      el.style.transition="transform 0.2s ease";
+      el.style.transform="scale(1)";
+    },10);
+  }
 }
 
 async function loadPins(){
@@ -141,12 +219,10 @@ async function loadPins(){
 
 loadPins();
 
-
-// 🌍 LIVE UPDATES
-client.channel('realtime pins')
-  .on('postgres_changes',{event:'INSERT',schema:'public',table:'pins'},payload=>{
-    addMarker(payload.new);
-  })
+/* 🔴 REALTIME */
+client.channel('pins')
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'pins'},
+    payload=>addMarker(payload.new))
   .subscribe();
 
 map.on('click',e=>{
@@ -175,6 +251,10 @@ async function submitPin(){
   }]);
 
   document.getElementById("formBox").style.display="none";
+}
+
+function start(){
+  document.getElementById("welcome").style.display="none";
 }
 </script>
 
