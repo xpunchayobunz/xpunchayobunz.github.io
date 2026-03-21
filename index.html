@@ -16,6 +16,8 @@
       background:#fff8f0; padding:10px 16px; border-radius:14px;
       box-shadow:0 4px 10px rgba(0,0,0,0.1);
       z-index:1000;
+      font-family:'Patrick Hand',cursive;
+      font-size:18px;
     }
 
     #picker, #formBox {
@@ -94,9 +96,40 @@
       text-align:left;
     }
 
+    /* ✨ POPUP CARD STYLE */
+    .popup-card {
+      background: #fff0fa;
+      padding: 10px 12px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      min-width: 120px;
+      border: 1px solid rgba(107,79,214,0.15);
+    }
+
+    .popup-name {
+      font-family: 'Patrick Hand', cursive;
+      font-size: 18px;
+      color: #6b4fd6;
+    }
+
+    .popup-message {
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      margin-top: 4px;
+      opacity: 0.85;
+    }
+
     .leaflet-popup-content {
-      font-family:'Patrick Hand',cursive;
-      font-weight:600;
+      margin: 8px 10px;
+    }
+
+    .leaflet-popup-content-wrapper {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .leaflet-popup-tip {
+      background: #fff0fa;
     }
   </style>
 </head>
@@ -105,14 +138,11 @@
 
 <div id="welcome">
   <div class="welcome-box">
-
     <div class="welcome-title">✨ Welcome ✨</div>
 
     <div>
       Click anywhere to drop a little chook and let me know where you're from
-
       <div class="welcome-chicken">🐔</div>
-
       add your username and a little message if you'd like 💜
     </div>
 
@@ -188,11 +218,27 @@ function createIcon(url){
   });
 }
 
+/* 🛡️ safety */
+function escapeHTML(str){
+  return str.replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#039;'
+  }[m]));
+}
+
 function addMarker(pin){
   L.marker([pin.lat,pin.lng],{
     icon:createIcon(chickens[pin.chicken]||chickens.blue)
   }).addTo(map)
-    .bindPopup(pin.name+(pin.message?"<br>"+pin.message:""));
+    .bindPopup(
+      `<div class="popup-card">
+        <div class="popup-name">${escapeHTML(pin.name)}</div>
+        ${pin.message ? `<div class="popup-message">${escapeHTML(pin.message)}</div>` : ""}
+      </div>`
+    );
 }
 
 async function loadPins(){
@@ -229,7 +275,6 @@ async function submitPin(){
 
   document.getElementById("formBox").style.display="none";
 
-  // manually add marker (like before)
   addMarker({
     name,
     message,
