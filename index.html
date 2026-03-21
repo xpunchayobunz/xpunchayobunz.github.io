@@ -183,31 +183,16 @@ function createIcon(url){
   return L.icon({
     iconUrl:url,
     iconSize:[40,40],
-    iconAnchor:[20,20],
-    popupAnchor:[0,-20]
+    iconAnchor:[20,34],
+    popupAnchor:[-18,-28]
   });
 }
 
-/* ✅ FIXED MARKER FUNCTION */
 function addMarker(pin){
-  const marker = L.marker([pin.lat,pin.lng],{
+  L.marker([pin.lat,pin.lng],{
     icon:createIcon(chickens[pin.chicken]||chickens.blue)
   }).addTo(map)
     .bindPopup(pin.name+(pin.message?"<br>"+pin.message:""));
-
-  // 🔥 THIS FIXES YOUR ISSUE
-  requestAnimationFrame(() => {
-    map.invalidateSize();
-  });
-
-  const el = marker.getElement();
-  if(el){
-    el.style.transform="scale(0)";
-    setTimeout(()=>{
-      el.style.transition="transform 0.2s ease";
-      el.style.transform="scale(1)";
-    },10);
-  }
 }
 
 async function loadPins(){
@@ -216,12 +201,6 @@ async function loadPins(){
 }
 
 loadPins();
-
-/* realtime */
-client.channel('pins')
-  .on('postgres_changes',{event:'INSERT',schema:'public',table:'pins'},
-    payload=>addMarker(payload.new))
-  .subscribe();
 
 map.on('click',e=>{
   selectedLocation=e.latlng;
@@ -249,6 +228,15 @@ async function submitPin(){
   }]);
 
   document.getElementById("formBox").style.display="none";
+
+  // manually add marker (like before)
+  addMarker({
+    name,
+    message,
+    lat:selectedLocation.lat,
+    lng:selectedLocation.lng,
+    chicken:selectedChicken
+  });
 }
 
 function start(){
