@@ -10,251 +10,85 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
   <style>
-    body {
-      margin:0;
-      font-family: 'Nunito', sans-serif;
-      background: #fdfaf6;
-    }
-
-    #map {
-      height: 100vh;
-      filter: saturate(0.95) brightness(1.02);
-    }
+    body { margin:0; font-family:'Nunito',sans-serif; background:#fdfaf6; }
+    #map { height:100vh; }
 
     .title {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #fff8f0;
-      padding: 10px 16px;
-      border-radius: 14px;
-      font-weight: 600;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      z-index: 1000;
-      text-align: center;
+      position:absolute; top:10px; left:50%; transform:translateX(-50%);
+      background:#fff8f0; padding:10px 16px; border-radius:14px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.1); z-index:1000; text-align:center;
     }
 
-    .subtitle {
-      font-size: 12px;
-      opacity: 0.6;
-    }
-
-    #picker {
-      display: none;
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #fff8f0;
-      padding: 12px;
-      border-radius: 14px;
-      z-index: 1000;
-      text-align: center;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    #picker, #formBox {
+      display:none;
+      position:absolute;
+      bottom:20px;
+      left:50%;
+      transform:translateX(-50%);
+      background:#fff8f0;
+      padding:14px;
+      border-radius:14px;
+      z-index:1000;
+      text-align:center;
+      box-shadow:0 6px 15px rgba(0,0,0,0.15);
     }
 
     #picker img {
-      width: 42px;
-      margin: 6px;
-      cursor: pointer;
-      transition: transform 0.2s ease;
+      width:42px;
+      margin:6px;
+      cursor:pointer;
     }
 
-    #picker img:hover {
-      transform: scale(1.2) rotate(-3deg);
+    input {
+      display:block;
+      margin:6px auto;
+      padding:6px;
+      border-radius:8px;
+      border:1px solid #ddd;
+      width:180px;
+      font-family:'Nunito';
     }
 
     button {
-      margin-top: 10px;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 10px;
-      background: #ffd6a5;
-      font-family: 'Nunito', sans-serif;
-      cursor: pointer;
+      margin-top:8px;
+      padding:6px 12px;
+      border:none;
+      border-radius:10px;
+      background:#ffd6a5;
+      cursor:pointer;
     }
 
-    button:hover { background: #ffbe7a; }
-
-    /* Popup */
     .leaflet-popup-content {
-      font-family: 'Patrick Hand', cursive;
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .leaflet-popup-content-wrapper {
-      background: #fff8ff;
-      border-radius: 14px;
-      transform: scale(0.8);
-      animation: popupIn 0.2s ease forwards;
-    }
-
-    @keyframes popupIn {
-      to { transform: scale(1); }
-    }
-
-    .leaflet-popup-tip {
-      background: #fff8ff;
-    }
-
-    /* Welcome */
-    #welcome {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(200, 180, 255, 0.7);
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      transition: opacity 0.5s ease;
-    }
-
-    #welcome.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .welcome-box {
-      background: #efe4ff;
-      padding: 28px;
-      border-radius: 22px;
-      text-align: center;
-      max-width: 320px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    }
-
-    .welcome-main {
-      font-size: 24px;
-      color: #6b4fd6;
-      margin-bottom: 6px;
-    }
-
-    .welcome-title {
-      font-family: 'Patrick Hand', cursive;
-      display: inline-block;
-      animation: floaty 3s ease-in-out infinite;
-    }
-
-    .welcome-sub {
-      font-size: 18px;
-      color: #6b4fd6;
-      margin-bottom: 14px;
-      font-weight: 600;
-      opacity: 0.9;
-    }
-
-    .welcome-text {
-      font-size: 14px;
-      line-height: 1.7;
-      color: #444;
-    }
-
-    /* 🐔 NO FLOAT NOW */
-    .welcome-chicken {
-      font-size: 18px;
-      margin: 4px 0 8px 0;
-    }
-
-    .welcome-icons {
-      margin-top: 10px;
-      font-size: 16px;
-      letter-spacing: 6px;
-      opacity: 0.8;
-    }
-
-    .welcome-sign {
-      margin-top: 14px;
-      font-size: 13px;
-      opacity: 0.7;
-    }
-
-    .welcome-box button {
-      margin-top: 15px;
-      background: #c4a7ff;
-      border-radius: 12px;
-    }
-
-    .welcome-box button:hover {
-      background: #b08cff;
-    }
-
-    .sparkle {
-      display: inline-block;
-      animation: twinkle 1.5s infinite alternate;
-    }
-
-    .sparkle:nth-child(1) { animation-delay: 0s; }
-    .sparkle:nth-child(3) { animation-delay: 0.5s; }
-
-    @keyframes twinkle {
-      from { opacity: 0.6; transform: scale(1); }
-      to { opacity: 1; transform: scale(1.2); }
-    }
-
-    @keyframes floaty {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-3px); }
-      100% { transform: translateY(0px); }
+      font-family:'Patrick Hand',cursive;
+      font-weight:600;
     }
   </style>
 </head>
 
 <body>
 
-<div id="welcome">
-  <div class="welcome-box">
-
-    <div class="welcome-main">
-      <span class="sparkle">✨</span>
-      <span class="welcome-title">Welcome</span>
-      <span class="sparkle">✨</span>
-    </div>
-
-    <div class="welcome-sub">
-      to my little chicken map
-    </div>
-
-    <div class="welcome-text">
-      Click anywhere to drop a little chook and let me know where you're from 🌍
-
-      <div class="welcome-chicken">🐔</div>
-
-      add your username and a little message if you'd like 💜
-    </div>
-
-    <div class="welcome-sign">
-      xPUNCHAYOBUNZ
-    </div>
-
-    <button onclick="closeWelcome()">Start exploring</button>
-
-  </div>
-</div>
-
 <div class="title">
   🐔 Chooks Across the World 🌍
-  <div class="subtitle">by xPUNCHAYOBUNZ</div>
 </div>
 
 <div id="map"></div>
 
+<!-- 🐔 picker -->
 <div id="picker">
   <p>Choose your chicken 🐔</p>
-  <img src="https://xpunchayobunz.github.io/blue.png" onclick="selectChicken('blue')">
-  <img src="https://xpunchayobunz.github.io/Green.png" onclick="selectChicken('Green')">
-  <img src="https://xpunchayobunz.github.io/orange.png" onclick="selectChicken('orange')">
-  <img src="https://xpunchayobunz.github.io/pink.png" onclick="selectChicken('pink')">
-  <img src="https://xpunchayobunz.github.io/purple.png" onclick="selectChicken('purple')">
-  <img src="https://xpunchayobunz.github.io/yellow.png" onclick="selectChicken('yellow')">
+  <img src="blue.png" onclick="chooseChicken('blue')">
+  <img src="Green.png" onclick="chooseChicken('Green')">
+  <img src="orange.png" onclick="chooseChicken('orange')">
+  <img src="pink.png" onclick="chooseChicken('pink')">
+  <img src="purple.png" onclick="chooseChicken('purple')">
+  <img src="yellow.png" onclick="chooseChicken('yellow')">
+</div>
 
-  <br>
-  <button onclick="cancelSelection()">Cancel</button>
+<!-- ✍️ form -->
+<div id="formBox">
+  <input id="name" placeholder="your username">
+  <input id="message" placeholder="your message (optional)">
+  <button onclick="submitPin()">add chook</button>
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -267,95 +101,80 @@ const client = window.supabase.createClient(
 );
 
 const chickens = {
-  blue: "https://xpunchayobunz.github.io/blue.png",
-  Green: "https://xpunchayobunz.github.io/Green.png",
-  orange: "https://xpunchayobunz.github.io/orange.png",
-  pink: "https://xpunchayobunz.github.io/pink.png",
-  purple: "https://xpunchayobunz.github.io/purple.png",
-  yellow: "https://xpunchayobunz.github.io/yellow.png"
+  blue:"blue.png",
+  Green:"Green.png",
+  orange:"orange.png",
+  pink:"pink.png",
+  purple:"purple.png",
+  yellow:"yellow.png"
 };
 
-let selectedLocation = null;
-let tempMarker = null;
+let selectedLocation=null;
+let selectedChicken=null;
 
-const map = L.map('map', {
-  worldCopyJump: false,
-  maxBounds: [[-90,-180],[90,180]],
-  maxBoundsViscosity: 1.0,
-  minZoom: 2,
-  maxZoom: 6
-}).setView([20,0],2);
+const map=L.map('map').setView([20,0],2);
 
-/* 🌈 COLOURFUL MAP */
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-  attribution: '',
-  subdomains: 'abcd',
-  maxZoom: 19
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+  subdomains:'abcd'
 }).addTo(map);
 
-function createIcon(url) {
+function createIcon(url){
   return L.icon({
-    iconUrl: url,
-    iconSize: [40,40],
-    iconAnchor: [20,34],
-    popupAnchor: [-18,-28]
+    iconUrl:url,
+    iconSize:[40,40],
+    iconAnchor:[20,34],
+    popupAnchor:[-18,-28]
   });
 }
 
-async function loadPins() {
-  const { data } = await client.from('pins').select('*');
+function addMarker(pin){
+  L.marker([pin.lat,pin.lng],{
+    icon:createIcon(chickens[pin.chicken]||chickens.blue)
+  }).addTo(map)
+    .bindPopup(pin.name+(pin.message?"<br>"+pin.message:""));
+}
 
-  data.forEach(pin => {
-    L.marker([pin.lat,pin.lng],{icon:createIcon(chickens[pin.chicken]||chickens.blue)})
-      .addTo(map)
-      .bindPopup(pin.name + (pin.message ? "<br>"+pin.message : ""));
-  });
+async function loadPins(){
+  const {data}=await client.from('pins').select('*');
+  data.forEach(addMarker);
 }
 
 loadPins();
 
-map.on('click', e => {
-  selectedLocation = e.latlng;
 
-  if (tempMarker) map.removeLayer(tempMarker);
+// 🌍 LIVE UPDATES
+client.channel('realtime pins')
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'pins'},payload=>{
+    addMarker(payload.new);
+  })
+  .subscribe();
 
-  tempMarker = L.marker([e.latlng.lat,e.latlng.lng]).addTo(map);
-
-  document.getElementById("picker").style.display = "block";
+map.on('click',e=>{
+  selectedLocation=e.latlng;
+  document.getElementById("picker").style.display="block";
 });
 
-function cancelSelection(){
-  selectedLocation=null;
-  if(tempMarker){ map.removeLayer(tempMarker); tempMarker=null; }
+function chooseChicken(color){
+  selectedChicken=color;
   document.getElementById("picker").style.display="none";
+  document.getElementById("formBox").style.display="block";
 }
 
-async function selectChicken(color){
-  const name = prompt("Your name:");
-  if(!name) return;
+async function submitPin(){
+  const name=document.getElementById("name").value;
+  const message=document.getElementById("message").value;
 
-  let message = prompt("Message (optional):") || "";
+  if(!name) return alert("enter name!");
 
-  const { error } = await client.from('pins').insert([
-    { name, message, lat:selectedLocation.lat, lng:selectedLocation.lng, chicken:color }
-  ]);
+  await client.from('pins').insert([{
+    name,
+    message,
+    lat:selectedLocation.lat,
+    lng:selectedLocation.lng,
+    chicken:selectedChicken
+  }]);
 
-  if(error){ alert("Error saving"); return; }
-
-  if(tempMarker){ map.removeLayer(tempMarker); tempMarker=null; }
-
-  L.marker([selectedLocation.lat,selectedLocation.lng],{icon:createIcon(chickens[color])})
-    .addTo(map)
-    .bindPopup(name + (message ? "<br>"+message : ""))
-    .openPopup();
-
-  document.getElementById("picker").style.display="none";
-}
-
-function closeWelcome(){
-  const el=document.getElementById("welcome");
-  el.classList.add("hidden");
-  setTimeout(()=>el.style.display="none",500);
+  document.getElementById("formBox").style.display="none";
 }
 </script>
 
