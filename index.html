@@ -11,9 +11,9 @@
     body { margin:0; font-family:'Nunito',sans-serif; }
     #map { height:100vh; }
 
-    /* 💜 subtle map tint (does NOT kill oceans) */
+    /* 💜 very subtle softening (optional) */
     .leaflet-tile {
-      filter: saturate(0.9) brightness(1.05);
+      filter: brightness(1.03) saturate(0.95);
     }
 
     .title {
@@ -223,9 +223,10 @@ const map = L.map('map', {
   maxZoom:6
 }).setView([20,0],2);
 
-/* 🌊 better map */
-L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-  maxZoom: 19
+/* 🌍 your chosen map */
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
 function createIcon(url){
