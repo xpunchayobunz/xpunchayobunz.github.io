@@ -12,9 +12,17 @@
     #map { height:100vh; }
 
     .title {
-      position:absolute; top:10px; left:50%; transform:translateX(-50%);
-      background:#fff8f0; padding:10px 16px; border-radius:14px;
+      position:absolute;
+      top:10px;
+      left:50%;
+      transform:translateX(-50%);
+      background: rgba(200,180,255,0.9);
+      color: #4b3bbd;
+      padding:10px 16px;
+      border-radius:14px;
+      border: 1px solid rgba(107,79,214,0.2);
       box-shadow:0 4px 10px rgba(0,0,0,0.1);
+      backdrop-filter: blur(4px);
       z-index:1000;
       font-family:'Patrick Hand',cursive;
       font-size:18px;
@@ -96,7 +104,7 @@
       text-align:left;
     }
 
-    /* ✨ POPUP CARD STYLE */
+    /* ✨ POPUP CARD */
     .popup-card {
       background: #fff0fa;
       padding: 10px 12px;
@@ -170,12 +178,15 @@
   <img src="https://xpunchayobunz.github.io/pink.png" onclick="chooseChicken('pink')">
   <img src="https://xpunchayobunz.github.io/purple.png" onclick="chooseChicken('purple')">
   <img src="https://xpunchayobunz.github.io/yellow.png" onclick="chooseChicken('yellow')">
+  <br>
+  <button onclick="cancelPin()" style="background:#eee;">cancel</button>
 </div>
 
 <div id="formBox">
   <input id="name" placeholder="your username">
   <input id="message" placeholder="your message (optional)">
   <button onclick="submitPin()">add chook</button>
+  <button onclick="cancelPin()" style="background:#eee;">cancel</button>
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -218,7 +229,6 @@ function createIcon(url){
   });
 }
 
-/* 🛡️ safety */
 function escapeHTML(str){
   return str.replace(/[&<>"']/g, m => ({
     '&':'&amp;',
@@ -249,14 +259,25 @@ async function loadPins(){
 loadPins();
 
 map.on('click',e=>{
-  selectedLocation=e.latlng;
+  document.getElementById("formBox").style.display="none";
   document.getElementById("picker").style.display="block";
+  selectedLocation=e.latlng;
+  selectedChicken=null;
 });
 
 function chooseChicken(color){
   selectedChicken=color;
   document.getElementById("picker").style.display="none";
   document.getElementById("formBox").style.display="block";
+}
+
+function cancelPin(){
+  document.getElementById("formBox").style.display="none";
+  document.getElementById("picker").style.display="none";
+  selectedLocation=null;
+  selectedChicken=null;
+  document.getElementById("name").value="";
+  document.getElementById("message").value="";
 }
 
 async function submitPin(){
