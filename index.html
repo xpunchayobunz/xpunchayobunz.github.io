@@ -11,9 +11,25 @@
     body { margin:0; font-family:'Nunito',sans-serif; }
     #map { height:100vh; }
 
-    /* 💜 very subtle softening (optional) */
+    /* 💜 subtle softening */
     .leaflet-tile {
       filter: brightness(1.03) saturate(0.95);
+    }
+
+    /* 💜 frame */
+    .map-frame {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      border-radius: 24px;
+      border: 2px solid rgba(200,180,255,0.6);
+      box-shadow: 
+        0 0 0 6px rgba(200,180,255,0.25),
+        0 8px 25px rgba(0,0,0,0.15);
+      pointer-events: none;
+      z-index: 500;
     }
 
     .title {
@@ -174,6 +190,7 @@
 
 <div class="title">🐔 Chooks Across the World 🌍</div>
 <div id="map"></div>
+<div class="map-frame"></div>
 
 <div id="picker">
   <p>Choose your chicken 🐔</p>
@@ -223,7 +240,6 @@ const map = L.map('map', {
   maxZoom:6
 }).setView([20,0],2);
 
-/* 🌍 your chosen map */
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '&copy; OpenStreetMap contributors'
