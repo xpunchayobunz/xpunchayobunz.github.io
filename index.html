@@ -127,7 +127,6 @@
       add your username and a little message if you'd like 💜
     </div>
 
-    <!-- 🐔 RULES -->
     <div class="rules">
       <div class="rules-title">little notes 🐔</div>
       • drop your chook roughly where you're from 🌍<br>
@@ -146,12 +145,12 @@
 
 <div id="picker">
   <p>Choose your chicken 🐔</p>
-  <img src="blue.png" onclick="chooseChicken('blue')">
-  <img src="Green.png" onclick="chooseChicken('Green')">
-  <img src="orange.png" onclick="chooseChicken('orange')">
-  <img src="pink.png" onclick="chooseChicken('pink')">
-  <img src="purple.png" onclick="chooseChicken('purple')">
-  <img src="yellow.png" onclick="chooseChicken('yellow')">
+  <img src="https://xpunchayobunz.github.io/blue.png" onclick="chooseChicken('blue')">
+  <img src="https://xpunchayobunz.github.io/Green.png" onclick="chooseChicken('Green')">
+  <img src="https://xpunchayobunz.github.io/orange.png" onclick="chooseChicken('orange')">
+  <img src="https://xpunchayobunz.github.io/pink.png" onclick="chooseChicken('pink')">
+  <img src="https://xpunchayobunz.github.io/purple.png" onclick="chooseChicken('purple')">
+  <img src="https://xpunchayobunz.github.io/yellow.png" onclick="chooseChicken('yellow')">
 </div>
 
 <div id="formBox">
@@ -169,13 +168,14 @@ const client = window.supabase.createClient(
   "sb_publishable_F2gIJKu5f-IcX_SAhSO_sw_XBWIkUBm"
 );
 
+/* ✅ FIXED IMAGE URLS */
 const chickens = {
-  blue:"blue.png",
-  Green:"Green.png",
-  orange:"orange.png",
-  pink:"pink.png",
-  purple:"purple.png",
-  yellow:"yellow.png"
+  blue: "https://xpunchayobunz.github.io/blue.png",
+  Green: "https://xpunchayobunz.github.io/Green.png",
+  orange: "https://xpunchayobunz.github.io/orange.png",
+  pink: "https://xpunchayobunz.github.io/pink.png",
+  purple: "https://xpunchayobunz.github.io/purple.png",
+  yellow: "https://xpunchayobunz.github.io/yellow.png"
 };
 
 let selectedLocation=null;
