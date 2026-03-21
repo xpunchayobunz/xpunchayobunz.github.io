@@ -8,14 +8,14 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
   <style>
-    body { margin:0; font-family:'Nunito',sans-serif; background:#fdfaf6; }
+    body { margin:0; font-family:'Nunito',sans-serif; }
     #map { height:100vh; }
 
     .title {
       position:absolute; top:10px; left:50%; transform:translateX(-50%);
       background:#fff8f0; padding:10px 16px; border-radius:14px;
-      box-shadow:0 4px 10px rgba(0,0,0,0.1); z-index:1000;
-      text-align:center;
+      box-shadow:0 4px 10px rgba(0,0,0,0.1);
+      z-index:1000;
     }
 
     #picker, #formBox {
@@ -56,7 +56,7 @@
       cursor:pointer;
     }
 
-    /* 🌸 Welcome */
+    /* welcome */
     #welcome {
       position:fixed;
       top:0; left:0;
@@ -83,11 +83,6 @@
       color:#6b4fd6;
     }
 
-    .welcome-text {
-      margin-top:10px;
-      font-size:14px;
-    }
-
     .welcome-chicken {
       margin:6px 0;
       font-size:18px;
@@ -98,11 +93,6 @@
       font-size:12px;
       opacity:0.7;
       text-align:left;
-    }
-
-    .rules-title {
-      font-weight:600;
-      margin-bottom:4px;
     }
 
     .leaflet-popup-content {
@@ -119,8 +109,8 @@
 
     <div class="welcome-title">✨ Welcome ✨</div>
 
-    <div class="welcome-text">
-      Click anywhere to drop a little chook and let me know where you're from 🌍
+    <div>
+      Click anywhere to drop a little chook and let me know where you're from 🌍<br><br>
 
       <div class="welcome-chicken">🐔</div>
 
@@ -128,7 +118,7 @@
     </div>
 
     <div class="rules">
-      <div class="rules-title">little notes 🐔</div>
+      <b>little notes 🐔</b><br>
       • drop your chook roughly where you're from 🌍<br>
       • one chook per person 👀<br>
       • keep it kind and cozy 💜<br>
@@ -168,24 +158,29 @@ const client = window.supabase.createClient(
   "sb_publishable_F2gIJKu5f-IcX_SAhSO_sw_XBWIkUBm"
 );
 
-/* ✅ FIXED IMAGE URLS */
 const chickens = {
-  blue: "https://xpunchayobunz.github.io/blue.png",
-  Green: "https://xpunchayobunz.github.io/Green.png",
-  orange: "https://xpunchayobunz.github.io/orange.png",
-  pink: "https://xpunchayobunz.github.io/pink.png",
-  purple: "https://xpunchayobunz.github.io/purple.png",
-  yellow: "https://xpunchayobunz.github.io/yellow.png"
+  blue:"https://xpunchayobunz.github.io/blue.png",
+  Green:"https://xpunchayobunz.github.io/Green.png",
+  orange:"https://xpunchayobunz.github.io/orange.png",
+  pink:"https://xpunchayobunz.github.io/pink.png",
+  purple:"https://xpunchayobunz.github.io/purple.png",
+  yellow:"https://xpunchayobunz.github.io/yellow.png"
 };
 
 let selectedLocation=null;
 let selectedChicken=null;
 
-const map=L.map('map').setView([20,0],2);
+/* ✅ YOUR ORIGINAL STABLE MAP */
+const map = L.map('map', {
+  worldCopyJump:false,
+  maxBounds:[[-90,-180],[90,180]],
+  maxBoundsViscosity:1.0,
+  minZoom:2,
+  maxZoom:6
+}).setView([20,0],2);
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
-  subdomains:'abcd'
-}).addTo(map);
+/* ✅ SAFE TILE (stable) */
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 function createIcon(url){
   return L.icon({
