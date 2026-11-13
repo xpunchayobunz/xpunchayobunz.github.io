@@ -1,1 +1,395 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chooks Across the World</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+<style>
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  padding:12px;
+  font-family:'Nunito',sans-serif;
+  background:#efe4ff;
+  color:#51427c;
+}
+
+.header {
+  text-align:center;
+  background:#d8c6ff;
+  padding:12px;
+  border-radius:14px;
+  margin-bottom:10px;
+}
+
+.header h2 {
+  font-family:'Patrick Hand',cursive;
+  font-size:23px;
+  margin:0;
+  color:#6b4fd6;
+}
+
+.header p {
+  font-size:12px;
+  margin:4px 0 0;
+}
+
+#map {
+  height:300px;
+  width:100%;
+  border-radius:14px;
+  border:3px solid #d8c6ff;
+  z-index:1;
+}
+
+.instructions {
+  text-align:center;
+  font-size:12px;
+  padding:9px;
+}
+
+#formBox {
+  display:none;
+  background:#fff8f0;
+  padding:12px;
+  border-radius:14px;
+  margin-top:10px;
+  box-shadow:0 3px 10px #00000015;
+}
+
+#formBox h3 {
+  margin:0 0 8px;
+  font-family:'Patrick Hand',cursive;
+  font-size:20px;
+}
+
+.chickens {
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:8px 0;
+}
+
+.chickens img {
+  width:42px;
+  height:42px;
+  object-fit:contain;
+  cursor:pointer;
+  border:2px solid transparent;
+  border-radius:10px;
+  padding:3px;
+}
+
+.chickens img.selected {
+  border-color:#9b7bea;
+  background:#eadfff;
+}
+
+input {
+  display:block;
+  width:100%;
+  padding:10px;
+  margin:7px 0;
+  border:1px solid #d8c6ff;
+  border-radius:9px;
+  font-family:inherit;
+  font-size:14px;
+}
+
+button {
+  padding:9px 14px;
+  border:0;
+  border-radius:10px;
+  background:#d8c6ff;
+  color:#51427c;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+}
+
+button:disabled {
+  opacity:.5;
+  cursor:wait;
+}
+
+.actions {
+  display:flex;
+  gap:8px;
+  justify-content:center;
+}
+
+.cancel {
+  background:#eee;
+}
+
+.status {
+  font-size:12px;
+  text-align:center;
+  margin:8px 0;
+}
+
+.popup-card {
+  background:#fff0fa;
+  padding:10px;
+  border-radius:12px;
+  min-width:120px;
+}
+
+.popup-name {
+  font-family:'Patrick Hand',cursive;
+  font-size:19px;
+  color:#6b4fd6;
+}
+
+.popup-message {
+  font-size:12px;
+  margin-top:4px;
+}
+
+.leaflet-popup-content-wrapper {
+  background:#fff0fa;
+  border-radius:12px;
+}
+
+@media(max-width:350px) {
+  body { padding:7px; }
+  #map { height:260px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h2>🐔 Chooks Across the World 🌍</h2>
+  <p>Let's see where the flock comes from! 💜</p>
+</div>
+
+<div class="instructions">
+  Tap the map to drop your chook!
+  <br>One chook per person. Keep it cozy!
+</div>
+
+<div id="map"></div>
+
+<div id="formBox">
+  <h3>Choose your chook! 🐔</h3>
+
+  <div class="chickens">
+    <img src="https://xpunchayobunz.github.io/blue.png" data-color="blue">
+    <img src="https://xpunchayobunz.github.io/Green.png" data-color="Green">
+    <img src="https://xpunchayobunz.github.io/orange.png" data-color="orange">
+    <img src="https://xpunchayobunz.github.io/pink.png" data-color="pink">
+    <img src="https://xpunchayobunz.github.io/purple.png" data-color="purple">
+    <img src="https://xpunchayobunz.github.io/yellow.png" data-color="yellow">
+  </div>
+
+  <input id="name" maxlength="40" placeholder="Your Twitch username">
+  <input id="message" maxlength="100" placeholder="A little message (optional)">
+
+  <div class="actions">
+    <button id="submitButton" onclick="submitPin()">Add chook 🐔</button>
+    <button class="cancel" onclick="cancelPin()">Cancel</button>
+  </div>
+
+  <div class="status" id="status"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const client = window.supabase.createClient(
+  "https://huggjwzemgmgaojvutni.supabase.co",
+  "sb_publishable_F2gIJKu5f-IcX_SAhSO_sw_XBWIkUBm"
+);
+
+const chickens = {
+  blue:"https://xpunchayobunz.github.io/blue.png",
+  Green:"https://xpunchayobunz.github.io/Green.png",
+  orange:"https://xpunchayobunz.github.io/orange.png",
+  pink:"https://xpunchayobunz.github.io/pink.png",
+  purple:"https://xpunchayobunz.github.io/purple.png",
+  yellow:"https://xpunchayobunz.github.io/yellow.png"
+};
+
+let selectedLocation = null;
+let selectedChicken = null;
+const markers = new Set();
+
+const map = L.map('map', {
+  worldCopyJump:false,
+  maxBounds:[[-90,-180],[90,180]],
+  maxBoundsViscosity:1,
+  minZoom:2,
+  maxZoom:6
+}).setView([20,0],2);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom:19,
+  attribution:'© OpenStreetMap contributors'
+}).addTo(map);
+
+function escapeHTML(str) {
+  return String(str || '').replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#039;'
+  }[m]));
+}
+
+function createIcon(color) {
+  return L.icon({
+    iconUrl:chickens[color] || chickens.blue,
+    iconSize:[36,36],
+    iconAnchor:[18,30],
+    popupAnchor:[0,-28]
+  });
+}
+
+function addMarker(pin) {
+  if (pin.id != null) {
+    if (markers.has(pin.id)) return;
+    markers.add(pin.id);
+  }
+
+  L.marker([pin.lat,pin.lng], {
+    icon:createIcon(pin.chicken)
+  }).addTo(map).bindPopup(`
+    <div class="popup-card">
+      <div class="popup-name">${escapeHTML(pin.name)}</div>
+      ${pin.message ?
+        `<div class="popup-message">${escapeHTML(pin.message)}</div>` : ''}
+    </div>
+  `);
+}
+
+async function loadPins() {
+  const {data,error} = await client
+    .from('pins')
+    .select('*');
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  (data || []).forEach(addMarker);
+}
+
+loadPins();
+
+map.on('click', e => {
+  selectedLocation = e.latlng;
+  selectedChicken = null;
+
+  document.getElementById('formBox').style.display = 'block';
+  document.getElementById('status').textContent = '';
+
+  document.querySelectorAll('.chickens img').forEach(img => {
+    img.classList.remove('selected');
+  });
+
+  document.getElementById('formBox').scrollIntoView({
+    behavior:'smooth',
+    block:'nearest'
+  });
+});
+
+document.querySelectorAll('.chickens img').forEach(img => {
+  img.addEventListener('click', () => {
+    selectedChicken = img.dataset.color;
+
+    document.querySelectorAll('.chickens img').forEach(other => {
+      other.classList.remove('selected');
+    });
+
+    img.classList.add('selected');
+  });
+});
+
+function cancelPin() {
+  selectedLocation = null;
+  selectedChicken = null;
+
+  document.getElementById('formBox').style.display = 'none';
+  document.getElementById('name').value = '';
+  document.getElementById('message').value = '';
+  document.getElementById('status').textContent = '';
+}
+
+async function submitPin() {
+  const name = document.getElementById('name').value.trim();
+  const message = document.getElementById('message').value.trim();
+  const status = document.getElementById('status');
+  const button = document.getElementById('submitButton');
+
+  if (!selectedLocation) {
+    status.textContent = 'Choose a spot on the map first!';
+    return;
+  }
+
+  if (!selectedChicken) {
+    status.textContent = 'Choose your chicken!';
+    return;
+  }
+
+  if (!name) {
+    status.textContent = 'Enter your username!';
+    return;
+  }
+
+  button.disabled = true;
+  status.textContent = 'Adding your chook... 🐔';
+
+  const {data,error} = await client
+    .from('pins')
+    .insert([{
+      name:name,
+      message:message,
+      lat:selectedLocation.lat,
+      lng:selectedLocation.lng,
+      chicken:selectedChicken
+    }])
+    .select()
+    .single();
+
+  button.disabled = false;
+
+  if (error) {
+    console.error(error);
+    status.textContent = 'Oops! Something went wrong. Try again!';
+    return;
+  }
+
+  addMarker(data);
+  cancelPin();
+  map.closePopup();
+}
+
+client
+  .channel('chooks-live-updates')
+  .on(
+    'postgres_changes',
+    {
+      event:'INSERT',
+      schema:'public',
+      table:'pins'
+    },
+    payload => addMarker(payload.new)
+  )
+  .subscribe();
+</script>
+
+</body>
+</html>
+
